@@ -43,26 +43,22 @@ void maze() {
   sensorValues[6] = analogRead(Seven);
   sensorValues[7] = analogRead(Eight);
 
-  // Check if any sensor detects the black line (assuming the black line corresponds to low readings)
-  bool blackDetected = false;
+  // Check if all sensors detect white surface (assuming white corresponds to high readings)
+  bool allWhiteDetected = true;
   for (int i = 0; i < SensorCount; i++) {
-    if (sensorValues[i] < 700) { // Adjust the threshold as needed
-      blackDetected = true;
-      break; // Exit loop early if black is detected
+    if (sensorValues[i] >= 800) { // Adjust the threshold as needed
+      allWhiteDetected = false;
+      break; // Exit loop early if any sensor detects black
     }
   }
 
-  // If black line is detected, adjust robot movement accordingly
-  if (blackDetected) {
-    // Adjust the robot's movement to follow the black line
-    // For example, you might want to activate different motors depending on which sensors detect the black line
-    // Below is just an example, you would need to adjust it based on your robot's configuration
-    digitalWrite(MotorA, HIGH); // Activate Motor A
-    digitalWrite(MotorB, HIGH); // Deactivate Motor B
-    // You can adjust the logic further based on which sensors detect the black line
-  } else {
-    // If no black line is detected, stop the robot
-        digitalWrite(MotorA, LOW); // Deactivate Motor A
+  // If all sensors detect white surface, stop the robot
+  if (allWhiteDetected) {
+    digitalWrite(MotorA, LOW); // Deactivate Motor A
     digitalWrite(MotorB, LOW); // Deactivate Motor B
+  } else {
+    // If any sensor detects black line, move forward
+    digitalWrite(MotorA, HIGH); // Activate Motor A
+    digitalWrite(MotorB, HIGH); // Activate Motor B
   }
 }
