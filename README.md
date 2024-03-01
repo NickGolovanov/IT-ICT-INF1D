@@ -11,8 +11,7 @@ This project involves creating a simple line-following robot using an Arduino bo
 - Motor driver module
 - DC motors (2x)
 - Chassis
-- Wheels
-- Motor
+- Wheels (2x)
 - Battery pack
 - Sensor
 
@@ -36,8 +35,10 @@ This project involves creating a simple line-following robot using an Arduino bo
 - Power on the robot.
 - Place it on a surface with a line to follow.
 - The robot will use its infrared sensors to detect the line and adjust its movement accordingly.
+- The robot will grab the block.
 - Refer to the code comments for understanding the logic behind the robot's movements.
 - The robot will continue following the line until manually turned off or encountering a specific condition (e.g., all sensors off the line).
+- The robot will lave the block.
 
 ## Code Explanation
 - **`setup()`**: Initializes pins for motor control and sensor reading.
