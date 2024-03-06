@@ -4,10 +4,9 @@ const int motorB1 = 3;
 const int motorB2 = 2;
 
 int sensorValues[] = {0,0,0,0,0,0,0,0};
-int sensorPins[] = {A7,A6,A5,A4,A3,A2,A1,A0};
+int sensorPins[] = {A0,A1,A2,A3,A4,A5,A6,A7};
 
 void setup() {
-  Serial.begin(9600);
   pinMode(motorA1, OUTPUT);
   pinMode(motorA2, OUTPUT);
   pinMode(motorB1, OUTPUT);
@@ -28,16 +27,9 @@ void loop() {
 //  if (sensorValues[3] == 1 || sensorValues[4] == 1) {
 //    forward();
 //  }
-//    for(int i = 0; i < 8; i++){
-//   Serial.print(sensorValues[i]);
-//   Serial.print(" ");    
-//    }
-//    Serial.println(" ");
-//   
-
-  if ((sensorValues[0] == 1 && sensorValues[1] == 1 && sensorValues[2] == 1) || (sensorValues[0] == 1 && sensorValues[1] == 1)){
-    right();
-  }
+//  else if ((sensorValues[0] == 1 && sensorValues[1] == 1 && sensorValues[2] == 1) || (sensorValues[0] == 1 && sensorValues[1] == 1)){
+//    right();
+//  }
   if ((sensorValues[5] == 1 && sensorValues[6] == 1 && sensorValues[7] == 1) || (sensorValues[6] == 1 && sensorValues[7] == 1)){
     left();
   }
@@ -100,10 +92,10 @@ void left() {
 }
 
 void right() {
-    analogWrite(motorA1, 200);
+    analogWrite(motorA1, 100);
     analogWrite(motorA2, 0);
     analogWrite(motorB1, 0);
-    analogWrite(motorB2, 200);
+    analogWrite(motorB2, 100);
 }
 
 void adjustLeft() {
