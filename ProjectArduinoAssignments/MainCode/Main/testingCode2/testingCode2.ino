@@ -1,13 +1,19 @@
-const int motorA1 = 5;
-const int motorA2 = 4;
-const int motorB1 = 3;
-const int motorB2 = 2;
+const int motorA1 = 7;
+const int motorA2 = 6;
+const int motorB1 = 5;
+const int motorB2 = 4;
+const int MotorR1 = 3;
+const int MotorR2 = 2;
+
 const int EchoPin = 12;
 const int TrigerPin = 13;
 const int Gripper = 8;
 
 int sensorValues[8];
 int sensorPins[] = {A7, A6, A5, A4, A3, A2, A1, A0};
+
+volatile int L = 0;
+volatile int R = 0;
 
 bool wait = true;
 bool set = false;
@@ -32,6 +38,9 @@ void setup() {
   pinMode(EchoPin, INPUT);
   pinMode(TrigerPin, OUTPUT);
   pinMode(Gripper, OUTPUT);
+
+  attachInterrupt(digitalPinToInterrupt(MotorR1), ISR_L, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(MotorR2), ISR_R, CHANGE);
 }
 
 
@@ -93,6 +102,45 @@ void entering()
 //}
 //================================================================================================//
 //void finish(
+//===============================================TURN LEFT & RIGHT FUNCTION=================================================//
+
+void ISR_L() {
+  L++;
+}
+
+void ISR_R() {
+  R++;
+}
+
+void turnLeft(int d){
+  L=0;
+  R=0;
+  
+  while(L < d){
+    digitalWrite(motorA1, LOW); //480
+    digitalWrite(motorA2, LOW);
+    digitalWrite(motorB1, HIGH); //474
+    digitalWrite(motorB2, LOW);
+
+    Serial.println(L);
+  }
+  stop();
+}
+
+void turnRight(int d){
+  L=0;
+  R=0;
+  
+  while(R < d){
+    digitalWrite(motorA1, 0); //480
+    digitalWrite(motorA2, 0);
+    digitalWrite(motorB1, 0); //474
+    digitalWrite(motorB2, 0);
+
+    Serial.println(R);
+  }
+  stop();
+}
 //================================================================================================//
 void activateGripper(int angle) {
   int pulseWidth = map(angle, 0, 180, 0, 255);
