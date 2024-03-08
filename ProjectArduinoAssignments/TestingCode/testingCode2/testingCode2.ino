@@ -1,10 +1,15 @@
-const int motorA1 = 5;
-const int motorA2 = 4;
-const int motorB1 = 3;
-const int motorB2 = 2;
+const int motorA1 = 7;
+const int motorA2 = 6;
+const int motorB1 = 5;
+const int motorB2 = 4;
+const int MotorR1 = 3;
+const int MotorR2 = 2;
 
 int sensorValues[] = {0,0,0,0,0,0,0,0};
 int sensorPins[] = {A0,A1,A2,A3,A4,A5,A6,A7};
+
+volatile int L = 0;
+volatile int R = 0;
 
 void setup() {
   pinMode(motorA1, OUTPUT);
@@ -19,6 +24,9 @@ void setup() {
   pinMode(A5, INPUT);
   pinMode(A6, INPUT);
   pinMode(A7, INPUT);
+
+  attachInterrupt(digitalPinToInterrupt(MotorR1), ISR_L, CHANGE);
+attachInterrupt(digitalPinToInterrupt(MotorR2), ISR_R, CHANGE);
 }
 
 void loop() {
@@ -31,7 +39,8 @@ void loop() {
 //    right();
 //  }
   if ((sensorValues[5] == 1 && sensorValues[6] == 1 && sensorValues[7] == 1) || (sensorValues[6] == 1 && sensorValues[7] == 1)){
-    left();
+    turnLeft();
+    delay(600);
   }
   else if (sensorValues[0] == 0 && sensorValues[1] == 0 && sensorValues[2] == 0 && sensorValues[3] == 0 && 
         sensorValues[4] == 0 && sensorValues[5] == 0 && sensorValues[6] == 0 && sensorValues[7] == 0) {
@@ -62,6 +71,43 @@ void getSensor(){
    Serial.println("");
 }
 
+void ISR_L() {
+  L++;
+}
+
+void ISR_R() {
+  R++;
+}
+
+void turnLeft(int d){
+  L=0;
+  R=0;
+  
+  while(L < d){
+    digitalWrite(motorA1, LOW); //480
+    digitalWrite(motorA2, LOW);
+    digitalWrite(motorB1, HIGH); //474
+    digitalWrite(motorB2, LOW);
+
+    Serial.println(L);
+  }
+  stop();
+}
+
+void turnRight(int d){
+  L=0;
+  R=0;
+  
+  while(R < d){
+    digitalWrite(motorA1, 0); //480
+    digitalWrite(motorA2, 0);
+    digitalWrite(motorB1, 0); //474
+    digitalWrite(motorB2, 0);
+
+    Serial.println(R);
+  }
+  stop();
+}
 
 void forward(){
     analogWrite(motorA1, 200); //480
