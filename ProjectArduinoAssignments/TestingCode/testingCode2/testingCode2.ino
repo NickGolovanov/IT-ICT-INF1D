@@ -7,13 +7,14 @@ const int MotorR2 = 2;
 
 const int EchoPin = 8; 
 const int TrigerPin = 9; 
-const int Gripper = 12; 
+const int Gripper = 11; 
 
 int sensorValues[] = {0,0,0,0,0,0,0,0};
 int sensorPins[] = {A0,A1,A2,A3,A4,A5,A6,A7};
 
 bool wait = true;
 bool set = false;
+bool solved = false;
 
 volatile int L = 0;
 volatile int R = 0;
@@ -48,6 +49,9 @@ void loop() {
   else if(!set){
     enter();
   }
+  else if (!solved){
+    maze();
+  }
 }
 
 void enter(){
@@ -60,7 +64,7 @@ void enter(){
   while(true){
       getSensor();
 
-      forwardSlow();
+      forward();
 
       if (sensorValues[0] == 1 && sensorValues[1] == 1 && sensorValues[2] == 1 && sensorValues[3] == 1 && 
       sensorValues[4] == 1 && sensorValues[5] == 1 && sensorValues[6] == 1 && sensorValues[7] == 1) {
@@ -79,28 +83,30 @@ void enter(){
 //        else if (sensorValues[5] == 1) {
 //          adjustLeft();
 //        }
-      else if (sensorValues[0] == 0 && sensorValues[1] == 0 && sensorValues[2] == 0 && sensorValues[5] == 1 || sensorValues[6] == 1 || sensorValues[7] == 1)
-      {
-        adjustRight();
-      }
-      else if (sensorValues[0] == 1 || sensorValues[1] == 1 || sensorValues[2] == 1 && sensorValues[5] == 0 && sensorValues[6] == 0 && sensorValues[7] == 0)
-      {
-        adjustLeft();
-      }
+//      else if (sensorValues[0] == 0 && sensorValues[1] == 0 && sensorValues[2] == 0 && sensorValues[5] == 1 || sensorValues[6] == 1 || sensorValues[7] == 1)
+//      {
+//        adjustRight();
+//      }
+//      else if (sensorValues[0] == 1 || sensorValues[1] == 1 || sensorValues[2] == 1 && sensorValues[5] == 0 && sensorValues[6] == 0 && sensorValues[7] == 0)
+//      {
+//        adjustLeft();
+//      }
 
-      if (lines > 4)
+      if (lines > 2)
     {
+      int distance = getUltrasonicDistance();
+      
       stop();
-      delay(200);
       activateGripper(0);
-      delay(100);
-      turnLeft(32);
+//      delay(200);
+//      delay(50);
+//      digitalWrite(Gripper, HIGH);
+      delay(1000);
+      turnLeft(33);
       break;
     }
-  }
+ }
   set = true;
-  
-
 }
 
 void maze(){
