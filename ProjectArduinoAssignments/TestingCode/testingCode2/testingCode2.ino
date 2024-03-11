@@ -5,8 +5,15 @@ const int motorB2 = 4;
 const int MotorR1 = 3;
 const int MotorR2 = 2;
 
+const int EchoPin = 8; 
+const int TrigerPin = 9; 
+const int Gripper = 12; 
+
 int sensorValues[] = {0,0,0,0,0,0,0,0};
 int sensorPins[] = {A0,A1,A2,A3,A4,A5,A6,A7};
+
+bool wait = true;
+bool set = false;
 
 volatile int L = 0;
 volatile int R = 0;
@@ -25,11 +32,78 @@ void setup() {
   pinMode(A6, INPUT);
   pinMode(A7, INPUT);
 
+  pinMode(EchoPin, INPUT);
+  pinMode(TrigerPin, OUTPUT);
+  pinMode(Gripper, OUTPUT);
+
   attachInterrupt(digitalPinToInterrupt(MotorR1), ISR_L, CHANGE);
-attachInterrupt(digitalPinToInterrupt(MotorR2), ISR_R, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(MotorR2), ISR_R, CHANGE);
 }
 
 void loop() {
+
+  if(wait){
+    detec();
+  }
+  else if(!set){
+    enter();
+  }
+}
+
+void enter(){
+  delay(1000);
+
+  int lines = 0;
+
+  forwardSlow();
+
+  while(true){
+      getSensor();
+
+      forwardSlow();
+
+      if (sensorValues[0] == 1 && sensorValues[1] == 1 && sensorValues[2] == 1 && sensorValues[3] == 1 && 
+      sensorValues[4] == 1 && sensorValues[5] == 1 && sensorValues[6] == 1 && sensorValues[7] == 1) {
+      
+      lines += 1;
+      delay(200);
+      }
+      if (sensorValues[0] == 0 && sensorValues[1] == 0 && sensorValues[2] == 0 && sensorValues[3] == 0 && 
+      sensorValues[4] == 0 && sensorValues[5] == 0 && sensorValues[6] == 0 && sensorValues[7] == 0) 
+      {
+        forward();
+      } 
+//        else if (sensorValues[2] == 1) {
+//          adjustRight();
+//        }  
+//        else if (sensorValues[5] == 1) {
+//          adjustLeft();
+//        }
+      else if (sensorValues[0] == 0 && sensorValues[1] == 0 && sensorValues[2] == 0 && sensorValues[5] == 1 || sensorValues[6] == 1 || sensorValues[7] == 1)
+      {
+        adjustRight();
+      }
+      else if (sensorValues[0] == 1 || sensorValues[1] == 1 || sensorValues[2] == 1 && sensorValues[5] == 0 && sensorValues[6] == 0 && sensorValues[7] == 0)
+      {
+        adjustLeft();
+      }
+
+      if (lines > 4)
+    {
+      stop();
+      delay(200);
+      activateGripper(0);
+      delay(100);
+      turnLeft(32);
+      break;
+    }
+  }
+  set = true;
+  
+
+}
+
+void maze(){
   getSensor();
   
 //  if (sensorValues[3] == 1 || sensorValues[4] == 1) {
@@ -39,7 +113,7 @@ void loop() {
 //    right();
 //  }
   if ((sensorValues[5] == 1 && sensorValues[6] == 1 && sensorValues[7] == 1) || (sensorValues[6] == 1 && sensorValues[7] == 1)){
-    turnLeft();
+    turnLeft(32);
     delay(600);
   }
   else if (sensorValues[0] == 0 && sensorValues[1] == 0 && sensorValues[2] == 0 && sensorValues[3] == 0 && 
@@ -99,10 +173,10 @@ void turnRight(int d){
   R=0;
   
   while(R < d){
-    digitalWrite(motorA1, 0); //480
-    digitalWrite(motorA2, 0);
-    digitalWrite(motorB1, 0); //474
-    digitalWrite(motorB2, 0);
+    digitalWrite(motorA1, HIGH); //480
+    digitalWrite(motorA2, LOW);
+    digitalWrite(motorB1, LOW); //474
+    digitalWrite(motorB2, LOW);
 
     Serial.println(R);
   }
@@ -110,11 +184,19 @@ void turnRight(int d){
 }
 
 void forward(){
-    analogWrite(motorA1, 200); //480
-    analogWrite(motorA2, 0);
-    analogWrite(motorB1, 200); //474
-    analogWrite(motorB2, 0);
+    digitalWrite(motorA1, HIGH); //480
+    digitalWrite(motorA2, LOW);
+    digitalWrite(motorB1, HIGH); //474
+    digitalWrite(motorB2, LOW);
  }
+
+void forwardSlow(){
+    analogWrite(motorA1, 0);
+    analogWrite(motorA2, 100); // 480
+    analogWrite(motorB1, 0);
+    analogWrite(motorB2, 100); // 474
+  
+}
 void backward(){
 
     analogWrite(motorA1, 0);
@@ -161,4 +243,36 @@ void turnAround(){
     analogWrite(motorA2, 0);
     analogWrite(motorB1, 0);
     analogWrite(motorB2, 150);
+}
+
+void activateGripper(int angle) {
+  int pulseWidth = map(angle, 0, 180, 0, 255);
+  digitalWrite(Gripper, HIGH);
+  Serial.println(pulseWidth);
+  delayMicroseconds(pulseWidth);
+  digitalWrite(Gripper, LOW);
+  delay(20);
+}
+
+int getUltrasonicDistance() {
+  digitalWrite(TrigerPin, LOW);
+  delayMicroseconds(5);
+  digitalWrite(TrigerPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TrigerPin, LOW);
+
+  long duration = pulseIn(EchoPin, HIGH);
+  int distance = duration * 0.034 / 2;
+
+  return distance;
+}
+
+void detec(){
+
+  int distcance = getUltrasonicDistance();
+
+   if(distcance < 25)
+  {
+    wait = false;
+  } 
 }
