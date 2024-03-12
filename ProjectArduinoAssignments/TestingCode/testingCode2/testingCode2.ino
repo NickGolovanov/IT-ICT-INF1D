@@ -7,7 +7,10 @@ const int MotorR2 = 2;
 
 const int EchoPin = 8; 
 const int TrigerPin = 9; 
-const int Gripper = 11; 
+const int Gripper = 12; 
+#define GRIPPER_TIME_OUT 20
+#define GRIPPER_CLOSE 950
+#define GRIPPER_OPEN 1600
 
 int sensorValues[] = {0,0,0,0,0,0,0,0};
 int sensorPins[] = {A0,A1,A2,A3,A4,A5,A6,A7};
@@ -97,9 +100,9 @@ void enter(){
       int distance = getUltrasonicDistance();
       
       stop();
+      delay(1000);
+      activateGripper(GRIPPER_CLOSE);
       activateGripper(0);
-//      delay(200);
-//      delay(50);
 //      digitalWrite(Gripper, HIGH);
       delay(1000);
       turnLeft(33);
@@ -119,7 +122,7 @@ void maze(){
 //    right();
 //  }
   if ((sensorValues[5] == 1 && sensorValues[6] == 1 && sensorValues[7] == 1) || (sensorValues[6] == 1 && sensorValues[7] == 1)){
-    turnLeft(32);
+    turnLeft(37);
     delay(600);
   }
   else if (sensorValues[0] == 0 && sensorValues[1] == 0 && sensorValues[2] == 0 && sensorValues[3] == 0 && 
@@ -251,14 +254,43 @@ void turnAround(){
     analogWrite(motorB2, 150);
 }
 
-void activateGripper(int angle) {
-  int pulseWidth = map(angle, 0, 180, 0, 255);
-  digitalWrite(Gripper, HIGH);
-  Serial.println(pulseWidth);
-  delayMicroseconds(pulseWidth);
-  digitalWrite(Gripper, LOW);
-  delay(20);
+//void activateGripper(int angle) {
+//  int pulseWidth = map(angle, 0, 180, 0, 255);
+//  digitalWrite(Gripper, HIGH);
+//  Serial.println(pulseWidth);
+//  delayMicroseconds(pulseWidth);
+//  digitalWrite(Gripper, LOW);
+//  delay(20);
+//}
+
+void activateGripper(int pulse) {
+  static unsigned long timer;
+  static int pulse1;
+  if (pulse > 0)
+  {
+    pulse1 = pulse;  
+  }
+  if (millis() > timer) {
+    digitalWrite(Gripper, HIGH);
+    delayMicroseconds(pulse1);
+    digitalWrite(Gripper, LOW);
+    timer = millis() + GRIPPER_TIME_OUT;
+  }
 }
+
+//void gripperToggle() {
+//  if (millis() > timer) {
+//    if (state == false) {
+//      gripper(GRIPPER_OPEN);
+//      state = true;
+//    } else {
+//      gripper(GRIPPER_CLOSE);
+//      state = false;
+//    }
+//    timer = millis() + GRIPPER_TOGGLE;
+//  }
+//}
+
 
 int getUltrasonicDistance() {
   digitalWrite(TrigerPin, LOW);
