@@ -101,17 +101,9 @@ void enter(){
       
       stop();
       delay(1000);
-      activateGripper(GRIPPER_CLOSE);
-      while (true)
-      {
-        activateGripper(GRIPPER_CLOSE);
-        activateGripper(0);
-        break;
-      }
-      
-//      digitalWrite(Gripper, HIGH);
-//      delay(1000);
-      turnLeft(33);
+      activateGripper(1000);
+      delay(1000);
+      turnLeft(35);
       break;
     }
  }
@@ -262,29 +254,23 @@ void turnAround(){
 
 //void activateGripper(int angle) {
 //  int pulseWidth = map(angle, 0, 180, 0, 255);
-//  digitalWrite(Gripper, HIGH);
-//  Serial.println(pulseWidth);
-//  delayMicroseconds(pulseWidth);
-//  digitalWrite(Gripper, LOW);
-//  delay(20);
-//}
+//    digitalWrite(Gripper, HIGH);
+//    Serial.println(pulseWidth);
+//    delayMicroseconds(pulseWidth);
+//    digitalWrite(Gripper, LOW);
+//    delay(20);
+//  }
 
 void activateGripper(int pulse) {
-  static unsigned long timer;
-  static int pulse1;
-  for (int i = 0; i < 35; i++){
-    if (pulse > 0)
-    {
-      pulse1 = pulse;  
-    }
-    if (millis() > timer) {
-      digitalWrite(Gripper, HIGH);
-      delayMicroseconds(pulse1);
-      digitalWrite(Gripper, LOW);
-      timer = millis() + GRIPPER_TIME_OUT;
-    }
-  } 
-}
+  for (int i = 0; i < 10; i++)
+  {
+    digitalWrite(Gripper, HIGH);
+    delayMicroseconds(pulse);
+    digitalWrite(Gripper, LOW);
+    delay(20);
+  }
+
+} 
 
 //void gripperToggle() {
 //  if (millis() > timer) {
