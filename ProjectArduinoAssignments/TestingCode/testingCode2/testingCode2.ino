@@ -102,9 +102,15 @@ void enter(){
       stop();
       delay(1000);
       activateGripper(GRIPPER_CLOSE);
-      activateGripper(0);
+      while (true)
+      {
+        activateGripper(GRIPPER_CLOSE);
+        activateGripper(0);
+        break;
+      }
+      
 //      digitalWrite(Gripper, HIGH);
-      delay(1000);
+//      delay(1000);
       turnLeft(33);
       break;
     }
@@ -266,16 +272,18 @@ void turnAround(){
 void activateGripper(int pulse) {
   static unsigned long timer;
   static int pulse1;
-  if (pulse > 0)
-  {
-    pulse1 = pulse;  
-  }
-  if (millis() > timer) {
-    digitalWrite(Gripper, HIGH);
-    delayMicroseconds(pulse1);
-    digitalWrite(Gripper, LOW);
-    timer = millis() + GRIPPER_TIME_OUT;
-  }
+  for (int i = 0; i < 35; i++){
+    if (pulse > 0)
+    {
+      pulse1 = pulse;  
+    }
+    if (millis() > timer) {
+      digitalWrite(Gripper, HIGH);
+      delayMicroseconds(pulse1);
+      digitalWrite(Gripper, LOW);
+      timer = millis() + GRIPPER_TIME_OUT;
+    }
+  } 
 }
 
 //void gripperToggle() {
