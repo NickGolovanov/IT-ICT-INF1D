@@ -5,19 +5,20 @@ const int motorB2 = 4;
 const int MotorR1 = 3;
 const int MotorR2 = 2;
 
-const int EchoPin = 8; 
-const int TrigerPin = 9; 
-const int Gripper = 12; 
+const int EchoPin = 8;
+const int TrigerPin = 9;
+const int Gripper = 12;
 #define GRIPPER_TIME_OUT 20
 #define GRIPPER_CLOSE 950
 #define GRIPPER_OPEN 1600
 
-int sensorValues[] = {0,0,0,0,0,0,0,0};
-int sensorPins[] = {A0,A1,A2,A3,A4,A5,A6,A7};
+int sensorValues[] = {0, 0, 0, 0, 0, 0, 0, 0};
+int sensorPins[] = {A0, A1, A2, A3, A4, A5, A6, A7};
 
-bool wait = true;
-bool set = false;
-bool solved = false;
+bool check = true;
+bool first = false;
+bool second = false;
+bool success = false;
 
 volatile int L = 0;
 volatile int R = 0;
@@ -46,59 +47,59 @@ void setup() {
 
 void loop() {
 
-  if(wait){
+  if (check) {
     detec();
   }
-  else if(!set){
+  else if (!first) {
     enter();
   }
-  else if (!solved){
+  else if (!second) {
     maze();
+  }
+  else if (!success) {
+    finish();
   }
 }
 
-void enter(){
+void finish() {
+      stop();
+      activateGripper(1700);
+      delay(500);
+      back(20);
+      stop();
+
+  success = true;
+
+}
+
+
+void enter() {
   delay(1000);
 
   int lines = 0;
 
   forwardSlow();
 
-  while(true){
-      getSensor();
+  while (true) {
+    getSensor();
 
-      forward();
+    forward();
 
-      if (sensorValues[0] == 1 && sensorValues[1] == 1 && sensorValues[2] == 1 && sensorValues[3] == 1 && 
-      sensorValues[4] == 1 && sensorValues[5] == 1 && sensorValues[6] == 1 && sensorValues[7] == 1) {
-      
+    if (sensorValues[0] == 1 && sensorValues[1] == 1 && sensorValues[2] == 1 && sensorValues[3] == 1 &&
+        sensorValues[4] == 1 && sensorValues[5] == 1 && sensorValues[6] == 1 && sensorValues[7] == 1) {
+
       lines += 1;
       delay(200);
-      }
-      if (sensorValues[0] == 0 && sensorValues[1] == 0 && sensorValues[2] == 0 && sensorValues[3] == 0 && 
-      sensorValues[4] == 0 && sensorValues[5] == 0 && sensorValues[6] == 0 && sensorValues[7] == 0) 
-      {
-        forward();
-      } 
-//        else if (sensorValues[2] == 1) {
-//          adjustRight();
-//        }  
-//        else if (sensorValues[5] == 1) {
-//          adjustLeft();
-//        }
-//      else if (sensorValues[0] == 0 && sensorValues[1] == 0 && sensorValues[2] == 0 && sensorValues[5] == 1 || sensorValues[6] == 1 || sensorValues[7] == 1)
-//      {
-//        adjustRight();
-//      }
-//      else if (sensorValues[0] == 1 || sensorValues[1] == 1 || sensorValues[2] == 1 && sensorValues[5] == 0 && sensorValues[6] == 0 && sensorValues[7] == 0)
-//      {
-//        adjustLeft();
-//      }
-
-      if (lines > 2)
+    }
+    if (sensorValues[0] == 0 && sensorValues[1] == 0 && sensorValues[2] == 0 && sensorValues[3] == 0 &&
+        sensorValues[4] == 0 && sensorValues[5] == 0 && sensorValues[6] == 0 && sensorValues[7] == 0)
+    {
+      forward();
+    }
+    if (lines > 2)
     {
       int distance = getUltrasonicDistance();
-      
+
       stop();
       delay(1000);
       activateGripper(1000);
@@ -106,31 +107,54 @@ void enter(){
       turnLeft(35);
       break;
     }
- }
-  set = true;
+  }
+  first = true;
 }
 
-void maze(){
+void maze() {
   getSensor();
-  
-//  if (sensorValues[3] == 1 || sensorValues[4] == 1) {
-//    forward();
-//  }
-//  else if ((sensorValues[0] == 1 && sensorValues[1] == 1 && sensorValues[2] == 1) || (sensorValues[0] == 1 && sensorValues[1] == 1)){
-//    right();
-//  }
-  if ((sensorValues[5] == 1 && sensorValues[6] == 1 && sensorValues[7] == 1) || (sensorValues[6] == 1 && sensorValues[7] == 1)){
-    turnLeft(37);
-    delay(600);
+    
+  if ((sensorValues[5] == 1 && sensorValues[6] == 1 && sensorValues[7] == 1) || (sensorValues[6] == 1 && sensorValues[7] == 1)) {
+      forward();
+      delay(50);
+      stop();
+      delay(200);
+      getSensor();
+
+      if(sensorValues[0] == 1 && sensorValues[1] == 1 && sensorValues[2] == 1 && sensorValues[3] == 1 &&
+         sensorValues[4] == 1 && sensorValues[5] == 1 && sensorValues[6] == 1 && sensorValues[7] == 1)
+         {
+            second = true;
+         }
+       else 
+       {        
+          turnLeft(37);
+          delay(100);
+       }
+
+    
   }
-  else if (sensorValues[0] == 0 && sensorValues[1] == 0 && sensorValues[2] == 0 && sensorValues[3] == 0 && 
-        sensorValues[4] == 0 && sensorValues[5] == 0 && sensorValues[6] == 0 && sensorValues[7] == 0) {
-      // If all sensors are off the line, turn around
-      turnAround();
-    }
+  else if (sensorValues[0] == 0 && sensorValues[1] == 0 && sensorValues[2] == 0 && sensorValues[3] == 0 &&
+           sensorValues[4] == 0 && sensorValues[5] == 0 && sensorValues[6] == 0 && sensorValues[7] == 0) {
+    turnAround();
+  }
+//    else if (sensorValues[0] == 1 && sensorValues[1] == 1 && sensorValues[2] == 1 && sensorValues[3] == 1 &&
+//             sensorValues[4] == 1 && sensorValues[5] == 1 && sensorValues[6] == 1 && sensorValues[7] == 1) {
+//      delay(300);
+//      forward();
+//      stop();
+//      getSensor();
+//      delay(500);
+//
+//      if(sensorValues[0] == 1 && sensorValues[1] == 1 && sensorValues[2] == 1 && sensorValues[3] == 1 &&
+//         sensorValues[4] == 1 && sensorValues[5] == 1 && sensorValues[6] == 1 && sensorValues[7] == 1)
+//         {
+//            second = true;
+//         }
+//  }
   else if (sensorValues[2] == 1) {
     adjustRight();
-  }  
+  }
   else if (sensorValues[5] == 1) {
     adjustLeft();
   }
@@ -140,16 +164,16 @@ void maze(){
 }
 
 
-void getSensor(){
-   for(int i = 0; i < sizeof(sensorPins) / sizeof(sensorPins[0]); i++) {
+void getSensor() {
+  for (int i = 0; i < sizeof(sensorPins) / sizeof(sensorPins[0]); i++) {
     int sensorState = analogRead(sensorPins[i]);
     sensorValues[i] = sensorState >= 800 ? 1 : 0;
 
     Serial.print(sensorValues[i]);
     Serial.print(" ");
-    
-   }
-   Serial.println("");
+
+  }
+  Serial.println("");
 }
 
 void ISR_L() {
@@ -160,11 +184,11 @@ void ISR_R() {
   R++;
 }
 
-void turnLeft(int d){
-  L=0;
-  R=0;
-  
-  while(L < d){
+void turnLeft(int d) {
+  L = 0;
+  R = 0;
+
+  while (L < d) {
     digitalWrite(motorA1, LOW); //480
     digitalWrite(motorA2, LOW);
     digitalWrite(motorB1, HIGH); //474
@@ -175,11 +199,11 @@ void turnLeft(int d){
   stop();
 }
 
-void turnRight(int d){
-  L=0;
-  R=0;
-  
-  while(R < d){
+void turnRight(int d) {
+  L = 0;
+  R = 0;
+
+  while (R < d) {
     digitalWrite(motorA1, HIGH); //480
     digitalWrite(motorA2, LOW);
     digitalWrite(motorB1, LOW); //474
@@ -190,66 +214,79 @@ void turnRight(int d){
   stop();
 }
 
-void forward(){
-    digitalWrite(motorA1, HIGH); //480
-    digitalWrite(motorA2, LOW);
-    digitalWrite(motorB1, HIGH); //474
-    digitalWrite(motorB2, LOW);
- }
 
-void forwardSlow(){
-    analogWrite(motorA1, 0);
-    analogWrite(motorA2, 100); // 480
-    analogWrite(motorB1, 0);
-    analogWrite(motorB2, 100); // 474
-  
+void back(int d) {
+  L = 0;
+  R = 0;
+
+  while (R < d) {
+    digitalWrite(motorA1, LOW); //480
+    digitalWrite(motorA2, HIGH);
+    digitalWrite(motorB1, LOW); //474
+    digitalWrite(motorB2, HIGH);
+  }
+  stop();
 }
-void backward(){
+void forward() {
+  digitalWrite(motorA1, HIGH); //480
+  digitalWrite(motorA2, LOW);
+  digitalWrite(motorB1, HIGH); //474
+  digitalWrite(motorB2, LOW);
+}
 
-    analogWrite(motorA1, 0);
-    analogWrite(motorA2, 200); // 480
-    analogWrite(motorB1, 0);
-    analogWrite(motorB2, 200); // 474
+void forwardSlow() {
+  analogWrite(motorA1, 0);
+  analogWrite(motorA2, 100); // 480
+  analogWrite(motorB1, 0);
+  analogWrite(motorB2, 100); // 474
+
+}
+void backward() {
+
+  analogWrite(motorA1, 0);
+  analogWrite(motorA2, 100); // 480
+  analogWrite(motorB1, 0);
+  analogWrite(motorB2, 100); // 474
 
 }
 void stop() {
-    analogWrite(motorA1, 0);
-    analogWrite(motorA2, 0);
-    analogWrite(motorB1, 0);
-    analogWrite(motorB2, 0);
+  analogWrite(motorA1, 0);
+  analogWrite(motorA2, 0);
+  analogWrite(motorB1, 0);
+  analogWrite(motorB2, 0);
 }
 
 void left() {
-    analogWrite(motorA1, 0);
-    analogWrite(motorA2, 200);
-    analogWrite(motorB1, 200);
-    analogWrite(motorB2, 0);
+  analogWrite(motorA1, 0);
+  analogWrite(motorA2, 150);
+  analogWrite(motorB1, 150);
+  analogWrite(motorB2, 0);
 }
 
 void right() {
-    analogWrite(motorA1, 100);
-    analogWrite(motorA2, 0);
-    analogWrite(motorB1, 0);
-    analogWrite(motorB2, 100);
+  analogWrite(motorA1, 100);
+  analogWrite(motorA2, 0);
+  analogWrite(motorB1, 0);
+  analogWrite(motorB2, 100);
 }
 
 void adjustLeft() {
-    analogWrite(motorA1, 0);
-    analogWrite(motorA2, 100);
-    analogWrite(motorB1, 150);
-    analogWrite(motorB2, 0);
+  analogWrite(motorA1, 0);
+  analogWrite(motorA2, 100);
+  analogWrite(motorB1, 150);
+  analogWrite(motorB2, 0);
 }
-void adjustRight(){
-    analogWrite(motorA1, 150);
-    analogWrite(motorA2, 0);
-    analogWrite(motorB1, 0);
-    analogWrite(motorB2, 100);
+void adjustRight() {
+  analogWrite(motorA1, 150);
+  analogWrite(motorA2, 0);
+  analogWrite(motorB1, 0);
+  analogWrite(motorB2, 100);
 }
-void turnAround(){
-    analogWrite(motorA1, 150);
-    analogWrite(motorA2, 0);
-    analogWrite(motorB1, 0);
-    analogWrite(motorB2, 150);
+void turnAround() {
+  analogWrite(motorA1, 150);
+  analogWrite(motorA2, 0);
+  analogWrite(motorB1, 0);
+  analogWrite(motorB2, 150);
 }
 
 //void activateGripper(int angle) {
@@ -270,7 +307,7 @@ void activateGripper(int pulse) {
     delay(20);
   }
 
-} 
+}
 
 //void gripperToggle() {
 //  if (millis() > timer) {
@@ -299,12 +336,12 @@ int getUltrasonicDistance() {
   return distance;
 }
 
-void detec(){
+void detec() {
 
   int distcance = getUltrasonicDistance();
 
-   if(distcance < 25)
+  if (distcance < 25)
   {
-    wait = false;
-  } 
+    check = false;
+  }
 }
