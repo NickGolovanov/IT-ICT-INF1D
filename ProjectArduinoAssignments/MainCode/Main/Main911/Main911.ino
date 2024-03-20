@@ -103,7 +103,7 @@ void enter() {
     {
       forward();
     }
-    if (lines > 2)
+    if (lines > 1)
     {
       int distance = getUltrasonicDistance();
 
@@ -240,7 +240,6 @@ void activateGripper(int pulse) {
     digitalWrite(Gripper, LOW);
     delay(20);
   }
-
 }
 //===============================================DISTANCE=================================================//
 
