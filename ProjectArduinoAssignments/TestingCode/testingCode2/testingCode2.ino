@@ -24,6 +24,7 @@ volatile int L = 0;
 volatile int R = 0;
 
 void setup() {
+ 
   pinMode(motorA1, OUTPUT);
   pinMode(motorA2, OUTPUT);
   pinMode(motorB1, OUTPUT);
@@ -104,7 +105,7 @@ void enter() {
       delay(1000);
       activateGripper(1000);
       delay(1000);
-      turnLeft(35);
+      turnLeft(37);
       break;
     }
   }
