@@ -1,3 +1,5 @@
+#include <Adafruit_NeoPixel.h>
+
 // Define motor pins
 const int motorA1 = 7;      //Left Forward
 const int motorA2 = 6;      //Left Backwards
@@ -30,6 +32,20 @@ bool first = false;
 bool second = false;
 bool success = false;
 
+// Define the number of NeoPixel LEDs and the pin they are connected to
+#define FORWARD_SLOW 4
+#define NEOPIN 10
+
+// Define RGB colors using Adafruit_NeoPixel library
+#define YELLOW pixels.Color(255, 255, 0)
+#define WHITE pixels.Color(255, 255, 255)
+#define GREEN pixels.Color(0, 255, 0)
+#define RED pixels.Color(255, 0, 0)
+#define OFF pixels.Color(0, 0, 0)
+#define BLUE pixels.Color(0, 0, 255)
+
+// Initialize NeoPixel object with defined number of pixels and pin
+Adafruit_NeoPixel pixels(FORWARD_SLOW, NEOPIN, NEO_GRB + NEO_KHZ800);
 //===========================================SET UP===================================================//
 void setup() {
   // Initialize motor pins
@@ -218,6 +234,7 @@ void turnLeft(int d){
   R=0;
   
   while(L < d){
+    turnLights();
     digitalWrite(motorA1, LOW);
     digitalWrite(motorA2, LOW);
     digitalWrite(motorB1, HIGH);
@@ -234,6 +251,7 @@ void turnRight(int d){
   R=0;
   
   while(R < d){
+    turnLights();
     digitalWrite(motorA1, 0); 
     digitalWrite(motorA2, 0);
     digitalWrite(motorB1, 0); //474
@@ -250,6 +268,7 @@ void back(int d){
   R = 0;
 
   while (R < d){
+    normalLights();
     digitalWrite(motorA1, LOW); //480
     digitalWrite(motorA2, HIGH);
     digitalWrite(motorB1, LOW); //474
@@ -287,6 +306,7 @@ int getUltrasonicDistance(){
 //===============================================MOTTOR A1-A2-B1-B2=================================================//
 
 void forward(){
+  forwardLights();
   digitalWrite(motorA1, HIGH);
   digitalWrite(motorA2, LOW);
   digitalWrite(motorB1, HIGH);
@@ -294,6 +314,7 @@ void forward(){
 }
 
 void forwardSlow(){
+  StartLights(FORWARD_SLOW);
   analogWrite(motorA1, 0);
   analogWrite(motorA2, 100);
   analogWrite(motorB1, 0);
@@ -301,7 +322,7 @@ void forwardSlow(){
 
 }
 void backward(){
-
+  normalLights();
   analogWrite(motorA1, 0);
   analogWrite(motorA2, 100);
   analogWrite(motorB1, 0);
@@ -309,6 +330,7 @@ void backward(){
 
 }
 void stop(){
+  stopLights();
   analogWrite(motorA1, 0);
   analogWrite(motorA2, 0);
   analogWrite(motorB1, 0);
@@ -316,6 +338,7 @@ void stop(){
 }
 
 void left(){
+  turnLights();
   analogWrite(motorA1, 0);
   analogWrite(motorA2, 150);
   analogWrite(motorB1, 150);
@@ -323,6 +346,7 @@ void left(){
 }
 
 void right(){
+  turnLights();
   analogWrite(motorA1, 100);
   analogWrite(motorA2, 0);
   analogWrite(motorB1, 0);
@@ -330,20 +354,101 @@ void right(){
 }
 
 void adjustLeft(){
+  turnLights();
   analogWrite(motorA1, 0);
   analogWrite(motorA2, 100);
   analogWrite(motorB1, 150);
   analogWrite(motorB2, 0);
 }
 void adjustRight() {
+  turnLights();
   analogWrite(motorA1, 150);
   analogWrite(motorA2, 0);
   analogWrite(motorB1, 0);
   analogWrite(motorB2, 100);
 }
 void turnAround(){
+  turnAroundLight();
   analogWrite(motorA1, 150);
   analogWrite(motorA2, 0);
   analogWrite(motorB1, 0);
   analogWrite(motorB2, 150);
+}
+
+//===============================================MOTTOR LIGHTS=================================================//
+// Function to set specific LEDs to represent left movement
+void leftLights()
+{
+    pixels.setPixelColor(0, YELLOW); // Yellow
+    pixels.setPixelColor(1, YELLOW); // Yellow
+    pixels.setPixelColor(2, WHITE);  // White
+    pixels.setPixelColor(3, WHITE);  // White
+    pixels.show(); // Update LEDs with new colors
+}
+
+// Function to set all LEDs to represent turning movement
+void turnLights()
+{
+   pixels.setPixelColor(0, YELLOW); // Yellow
+   pixels.setPixelColor(1, YELLOW); // Yellow
+   pixels.setPixelColor(2, YELLOW); // Yellow
+   pixels.setPixelColor(3, YELLOW); // Yellow
+   pixels.show(); // Update LEDs with new colors
+}
+
+// Function to set all LEDs to represent stopped movement
+void stopLights()
+{
+  pixels.setPixelColor(0, GREEN); // Green
+  pixels.setPixelColor(1, GREEN); // Green
+  pixels.setPixelColor(2, WHITE); // White
+  pixels.setPixelColor(3, WHITE); // White
+  pixels.show(); // Update LEDs with new colors
+}
+
+// Function to set specific LED to represent starting movement
+void StartLights(int lightNR)
+{
+  pixels.setPixelColor(lightNR, BLUE); // Blue
+  pixels.show(); // Update LEDs with new colors
+}
+
+// Function to set all LEDs to represent forward movement
+void forwardLights()
+{
+  pixels.setPixelColor(0, GREEN); // Green
+  pixels.setPixelColor(1, GREEN); // Green
+  pixels.setPixelColor(2, GREEN); // Green
+  pixels.setPixelColor(3, GREEN); // Green
+  pixels.show(); // Update LEDs with new colors
+}
+
+// Function to set all LEDs to represent normal state
+void normalLights() 
+{
+  pixels.setPixelColor(0, WHITE); // White
+  pixels.setPixelColor(1, WHITE); // White
+  pixels.setPixelColor(2, WHITE); // White
+  pixels.setPixelColor(3, WHITE); // White
+  pixels.show(); // Update LEDs with new colors
+}
+
+// Function to set all LEDs to represent turning around movement
+void turnAroundLight() 
+{
+  pixels.setPixelColor(0, RED); // Red
+  pixels.setPixelColor(1, RED); // Red
+  pixels.setPixelColor(2, RED); // Red
+  pixels.setPixelColor(3, RED); // Red
+  pixels.show(); // Update LEDs with new colors
+}
+
+// Function to set all LEDs to be turned off
+void lightsOff()
+{
+  pixels.setPixelColor(0, OFF); // Off
+  pixels.setPixelColor(1, OFF); // Off
+  pixels.setPixelColor(2, OFF); // Off
+  pixels.setPixelColor(3, OFF); // Off
+  pixels.show(); // Update LEDs with new colors
 }
