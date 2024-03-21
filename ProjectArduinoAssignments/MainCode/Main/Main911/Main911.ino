@@ -33,7 +33,7 @@ bool second = false;
 bool success = false;
 
 // Define the number of NeoPixel LEDs and the pin they are connected to
-#define FORWARD_SLOW 4
+#define NUM_PIXELS 4
 #define NEOPIN 10
 
 // Define RGB colors using Adafruit_NeoPixel library
@@ -44,8 +44,10 @@ bool success = false;
 #define OFF pixels.Color(0, 0, 0)
 #define BLUE pixels.Color(0, 0, 255)
 
+int colorValues[] = {0, 0, 0, 0, 0, 0};
+
 // Initialize NeoPixel object with defined number of pixels and pin
-Adafruit_NeoPixel pixels(FORWARD_SLOW, NEOPIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIN, NEO_GRB + NEO_KHZ800);
 //===========================================SET UP===================================================//
 void setup() {
   // Initialize motor pins
@@ -69,6 +71,10 @@ void setup() {
   // Attach interrupts for motor tracking
   attachInterrupt(digitalPinToInterrupt(MotorR1), ISR_L, CHANGE);
   attachInterrupt(digitalPinToInterrupt(MotorR2), ISR_R, CHANGE);
+
+  pixels.begin();
+
+  lightsOff();
 }
 
 //===========================================LOOP===================================================//
@@ -314,7 +320,7 @@ void forward(){
 }
 
 void forwardSlow(){
-  StartLights(FORWARD_SLOW);
+  StartLights(NUM_PIXELS);
   analogWrite(motorA1, 0);
   analogWrite(motorA2, 100);
   analogWrite(motorB1, 0);
@@ -450,5 +456,4 @@ void lightsOff()
   pixels.setPixelColor(1, OFF); // Off
   pixels.setPixelColor(2, OFF); // Off
   pixels.setPixelColor(3, OFF); // Off
-  pixels.show(); // Update LEDs with new colors
-}
+  pix
