@@ -133,18 +133,16 @@ void enter(){
       forward();
     }
     if (lines > 2){
-      int distance = getUltrasonicDistance();
-
       stop();
       delay(1000);
       activateGripper(1000);
       delay(1000);
       turnLeft(35);
+      first = true;
       break;
     }
   }
   
-  first = true;
 }
 //===========================================MAZE===================================================//
 // Function for navigating the maze
