@@ -27,7 +27,7 @@ const int Gripper = 12;
 #define GRIPPER_CLOSE 950
 #define GRIPPER_OPEN 1600
 
-Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIN, NEO_RGB + NEO_KHZ800);
 
 int sensorValues[] = {0,0,0,0,0,0,0,0};
 int sensorPins[] = {A0,A1,A2,A3,A4,A5,A6,A7};
@@ -186,7 +186,7 @@ void turnLeft(int d){
   R=0;
   
   while(L < d){
-    turnLights();
+    leftLights();
     digitalWrite(motorA1, LOW); //480
     digitalWrite(motorA2, LOW);
     digitalWrite(motorB1, HIGH); //474
@@ -202,7 +202,7 @@ void turnRight(int d){
   R=0;
   
   while(R < d){
-    turnLights();
+    rightLights();
     digitalWrite(motorA1, HIGH); //480
     digitalWrite(motorA2, LOW);
     digitalWrite(motorB1, LOW); //474
@@ -214,7 +214,7 @@ void turnRight(int d){
 }
 
 void forward(){
-    forwardLights();
+    normalLights();
     digitalWrite(motorA1, HIGH); //480
     digitalWrite(motorA2, LOW);
     digitalWrite(motorB1, HIGH); //474
@@ -222,7 +222,7 @@ void forward(){
  }
 
 void forwardSlow(){
-    StartLights(NUM_PIXELS);
+    detectLights();
     analogWrite(motorA1, 0);
     analogWrite(motorA2, 100); // 480
     analogWrite(motorB1, 0);
@@ -246,7 +246,7 @@ void stop() {
 }
 
 void left() {
-    turnLights();
+    leftLights();
     analogWrite(motorA1, 0);
     analogWrite(motorA2, 200);
     analogWrite(motorB1, 200);
@@ -254,7 +254,7 @@ void left() {
 }
 
 void right() {
-    turnLights();
+    rightLights();
     analogWrite(motorA1, 100);
     analogWrite(motorA2, 0);
     analogWrite(motorB1, 0);
@@ -269,7 +269,6 @@ void adjustLeft() {
     analogWrite(motorB2, 0);
 }
 void adjustRight(){;
-    turnLights();
     analogWrite(motorA1, 150);
     analogWrite(motorA2, 0);
     analogWrite(motorB1, 0);
@@ -319,18 +318,18 @@ void activateGripper(int pulse) {
 void leftLights()
 {
     pixels.setPixelColor(0, YELLOW); // Yellow
-    pixels.setPixelColor(1, YELLOW); // Yellow
+    pixels.setPixelColor(1, WHITE); // Yellow
     pixels.setPixelColor(2, WHITE);  // White
-    pixels.setPixelColor(3, WHITE);  // White
+    pixels.setPixelColor(3, YELLOW);  // White
     pixels.show();
 }
 
-void turnLights()
+void rightLights()
 {
-   pixels.setPixelColor(0, YELLOW); // Yellow
+   pixels.setPixelColor(0, WHITE); // Yellow
    pixels.setPixelColor(1, YELLOW); // Yellow
    pixels.setPixelColor(2, YELLOW); // Yellow
-   pixels.setPixelColor(3, YELLOW); // Yellow
+   pixels.setPixelColor(3, WHITE); // Yellow
    pixels.show();
 }
 
@@ -349,14 +348,6 @@ void StartLights(int lightNR)
   pixels.show();
 }
 
-void forwardLights()
-{
-  pixels.setPixelColor(0, GREEN);
-  pixels.setPixelColor(1, GREEN); 
-  pixels.setPixelColor(2, GREEN);  
-  pixels.setPixelColor(3, GREEN);
-  pixels.show();
-}
 
 void normalLights() 
 {
@@ -383,6 +374,15 @@ void lightsOff()
   pixels.setPixelColor(3, OFF);
   pixels.show();
 }
+void detectLights()
+{
+  pixels.setPixelColor(0, GREEN);
+  pixels.setPixelColor(1, GREEN);
+  pixels.setPixelColor(2, GREEN);
+  pixels.setPixelColor(3, GREEN);
+  pixels.show();
+}
+
 
 
 
@@ -401,11 +401,15 @@ int getUltrasonicDistance() {
 }
 
 void detec(){
+  // Change all lights to green
+  for(int i = 0; i < NUM_PIXELS; i++) {
+    pixels.setPixelColor(i, GREEN);
+  }
+  pixels.show();
 
-  int distcance = getUltrasonicDistance();
+  int distance = getUltrasonicDistance();
 
-   if(distcance < 25)
-  {
+  if(distance < 25) {
     wait = false;
   } 
 }
