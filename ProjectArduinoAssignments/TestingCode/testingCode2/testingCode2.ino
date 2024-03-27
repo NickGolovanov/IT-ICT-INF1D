@@ -132,27 +132,51 @@ void enter(){
 }
 
 void maze(){
-  getSensor();
-  
-//  if (sensorValues[3] == 1 || sensorValues[4] == 1) {
+//  getSensor();
+// 
+//  if ((sensorValues[5] == 1 && sensorValues[6] == 1 && sensorValues[7] == 1) || (sensorValues[6] == 1 && sensorValues[7] == 1)){
+//    turnLeft(37);
+//    delay(600);
+//  }
+//  else if (sensorValues[0] == 0 && sensorValues[1] == 0 && sensorValues[2] == 0 && sensorValues[3] == 0 && 
+//        sensorValues[4] == 0 && sensorValues[5] == 0 && sensorValues[6] == 0 && sensorValues[7] == 0) {
+//      // If all sensors are off the line, turn around
+//      turnAround();
+//    }
+//  else if (sensorValues[2] == 1) {
+//    adjustRight();
+//  }  
+//  else if (sensorValues[5] == 1) {
+//    adjustLeft();
+//  }
+//  else {
 //    forward();
 //  }
-//  else if ((sensorValues[0] == 1 && sensorValues[1] == 1 && sensorValues[2] == 1) || (sensorValues[0] == 1 && sensorValues[1] == 1)){
-//    right();
-//  }
-  if ((sensorValues[5] == 1 && sensorValues[6] == 1 && sensorValues[7] == 1) || (sensorValues[6] == 1 && sensorValues[7] == 1)){
-    turnLeft(37);
-    delay(600);
+
+  getSensor();
+    
+  if (leftSensors()) {
+      forward();
+      delay(50);
+      stop();
+      delay(200);
+      getSensor();
+
+      if(allBlackSensors()){
+            second = true;
+       }
+       else {        
+          turnLeft(37);
+          delay(100);
+       }
   }
-  else if (sensorValues[0] == 0 && sensorValues[1] == 0 && sensorValues[2] == 0 && sensorValues[3] == 0 && 
-        sensorValues[4] == 0 && sensorValues[5] == 0 && sensorValues[6] == 0 && sensorValues[7] == 0) {
-      // If all sensors are off the line, turn around
-      turnAround();
-    }
-  else if (sensorValues[2] == 1) {
+  else if (allWhiteSensors()) {
+    turnAround();
+  }
+  else if (adjustRightSensors()) {
     adjustRight();
-  }  
-  else if (sensorValues[5] == 1) {
+  }
+  else if (adjustLeftSensors()) {
     adjustLeft();
   }
   else {
