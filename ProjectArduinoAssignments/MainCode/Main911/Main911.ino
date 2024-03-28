@@ -184,15 +184,16 @@ void finish() {
   stop();
   activateGripper(1700);
   delay(500);
-  back(20);
+  back(30);
   stop();
+  ending = true;
+  noInterrupts();
   while (true) {
     turnAroundLight();
     delay(200);
     forwardLights();
     delay(200);
   }
-  ending = true;
 }
 //===============================================BOOL=================================================//
 
