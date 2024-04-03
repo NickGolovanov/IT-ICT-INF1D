@@ -115,7 +115,7 @@ void detectObject() {
 }
 //===========================================START===================================================//
 void enter() {
-  delay(1000);
+  delay(1500);
 
   int lines = 0;
 
@@ -183,7 +183,7 @@ void maze() {
 void finish() {
   stop();
   activateGripper(1700);
-  delay(500);
+  delay(300);
   back(30);
   stop();
   ending = true;
